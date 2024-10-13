@@ -1,0 +1,93 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "URL Hashing and Click Tracking API",
+    "version": "1.0.0",
+    "description": "API documentation for the URL Hashing and Click Tracking System."
+  },
+  "servers": [
+    {
+      "url": "{BASE_URL}"
+    }
+  ],
+  "paths": {
+    "/generate": {
+      "post": {
+        "summary": "Generate a hashed URL",
+        "description": "Generates a hashed URL for the provided original URL and optional usage limit.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "originalUrl": {
+                    "type": "string",
+                    "example": "https://example.com/?utm_source=newsletter"
+                  },
+                  "usageLimit": {
+                    "type": "integer",
+                    "example": 5
+                  }
+                },
+                "required": ["originalUrl"] 
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully created hashed URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "hashedUrl": {
+                      "type": "string",
+                      "example": "http://localhost:5000/abcd1234"
+                    }
+                  },
+                  "required": ["hashedUrl"]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error generating hashed URL"
+          }
+        }
+      }
+    },
+    "/{hashedKey}": {
+      "get": {
+        "summary": "Redirect to the original URL",
+        "description": "Redirects to the original URL associated with the hashed key.",
+        "parameters": [
+          {
+            "name": "hashedKey",
+            "in": "path",
+            "required": true,
+            "description": "The hashed key of the URL.",
+            "schema": {
+              "type": "string",
+              "example": "abcd1234"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirected to original URL"
+          },
+          "404": {
+            "description": "URL not found"
+          },
+          "403": {
+            "description": "Usage limit reached"
+          }
+        }
+      }
+    }
+  }
+}
